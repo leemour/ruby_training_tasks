@@ -13,8 +13,10 @@ Each turn at the beginning of the turn player can choose to do normal attack or 
 Player has only 1 special attack.  
 When a program is launched a new game is started.  
 The player chooses who goes (hits) first: monster or player.  
-Each turn the damage of each hit and resuming health are logged into the console like this:  
+Each turn the damage of each hit and resuming health are printed to the console like this:  
 "Player hits monster for 4 damage. Monster has 12 health left"  
 When game ends, the result is printed to the console.  
 When game ends the player can choose to start the game again.  
 The player can exit the game any time by writing "quit".  
+
+Use OOP approaches you've learned to implement this functionality. Try to reuse as much code as possible.
