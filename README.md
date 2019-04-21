@@ -1,4 +1,4 @@
-# Ruby Traingin Tasks
+# Ruby Training Tasks
 
 ## Monster Fight
 
