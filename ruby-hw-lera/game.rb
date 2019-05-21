@@ -1,52 +1,20 @@
-require_relative "player"
-require_relative "monster"
-require_relative "console"
-
 class Game
 
-  def initialize()
-    @monster = Monster.new()
-    @player = Player.new()
+  def initialize
+    @fighters= []
   end
 
-  def start()
-    choose_order()
+  def start
+    choose_order
 
     puts 'FIGHT!'
 
-    if !@is_player_first
-      @monster.hit(@player)
+    while @fighters[0].alive? && @fighters[1].alive? do
+      @fighters[0].hit(@fighters[1])
+      @fighters[1].hit(@fighters[0])
     end
 
-    while @monster.alive? && @player.alive? do
-
-      if @player.alive?
-        command = Console.get_command()
-
-        case command
-        when /\Ahit\z/i
-          @player.hit(@monster)
-        when /\Asuperhit\z/i
-          if @player.has_superhits? 
-            @player.superhit(@monster)
-          else 
-            puts 'You already used superhit!'
-            redo
-          end
-        when /\Aquit\z/i
-          exit
-        else 
-          puts 'Invalid command'
-          redo
-        end
-      end
-
-      if @monster.alive?
-        @monster.hit(@player) 
-      end
-    end
-
-    if @monster.alive?
+    if @fighters[0].alive? && @fighters[0].class.name != 'Player'
       puts 'You lose'
     else
       puts 'You win'
@@ -54,18 +22,20 @@ class Game
 
   end
 
-  def choose_order()
+  def choose_order
     puts 'Who will be first?'
+    monster = Monster.new
+    player = Player.new
 
-    while @is_player_first.nil?
-      command = Console.get_command()
+    while @fighters.empty?
+      command = Console.get_command
 
-      case command
-      when /\Ame\z/i
-        @is_player_first = true
-      when /\Amonster\z/i
-        @is_player_first = false
-      when /\Aquit\z/i
+      case command.downcase
+      when 'me'
+        @fighters << player << monster
+      when 'monster'
+        @fighters << monster << player
+      when 'quit'
         exit
       else 
         puts 'Invalid command'
@@ -73,5 +43,4 @@ class Game
       end
     end
   end
-
 end
