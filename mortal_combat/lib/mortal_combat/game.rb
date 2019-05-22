@@ -12,7 +12,7 @@ module MortalCombat
         ============================================
       WELL
       loop do
-        unless Command.gets('new_game').command == 'yes'
+        unless Command.gets('new_game') == 'yes'
           puts "Bye bye!"
           return
         end
@@ -28,7 +28,7 @@ module MortalCombat
     end
 
     def start
-      fighters = if Command.gets('first_move').command == 'player'
+      fighters = if Command.gets('first_move') == 'player'
         [player, monster]
       else
         [monster, player]

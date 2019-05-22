@@ -16,7 +16,8 @@ module MortalCombat
     def self.gets(command_name)
       puts PROMPTS[command_name]
       print ">> "
-      new Kernel.gets.strip.downcase
+      command = new Kernel.gets.strip.downcase
+      command.public_send(command_name)
     end
 
     %w[new_game first_move attack_type].each do |command_name|
@@ -36,10 +37,12 @@ module MortalCombat
     private
 
     def gets_until_valid(command_name)
-      unless Command.const_get("#{command_name}s".upcase).include? command
-        return Command.gets.public_send(command_name)
+      valid_commands = Command.const_get("#{command_name}s".upcase)
+      unless valid_commands.include? command
+        puts "Invalid command. Valid commands are: #{valid_commands}"
+        return Command.gets(command_name)
       end
-      command_name
+      command
     end
   end
 end

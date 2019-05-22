@@ -54,7 +54,7 @@ module MortalCombat
 
     def determine_attack_type(type)
       if type.nil? && has_special_attack?
-        if Command.gets('attack_type').command == 'special'
+        if Command.gets('attack_type') == 'special'
           type = 'special'
           @special_attack -= 1
         end
