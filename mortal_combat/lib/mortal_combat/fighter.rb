@@ -8,6 +8,7 @@ module MortalCombat
       raise ArgumentError.new("Health must be positive integer") if health <= 0
       @health = health
       @attack_power = attack_power.respond_to?(:sample) ? attack_power : attack_power.to_a
+      @attacks = {}
     end
 
     def attack(opponent, type = nil)
@@ -28,16 +29,12 @@ module MortalCombat
       puts "#{klass} has #{health} health left"
     end
 
-    def has_special_attack?
-      @special_attack.to_i > 0
-    end
-
     def dead?
       self.health <= 0
     end
 
     def klass
-      self.class.to_s.split('::').last
+      @klass ||= self.class.to_s.split('::').last
     end
 
     def move
@@ -53,11 +50,9 @@ module MortalCombat
     end
 
     def determine_attack_type(type)
-      if type.nil? && has_special_attack?
-        if Command.gets('attack_type') == 'special'
-          type = 'special'
-          @special_attack -= 1
-        end
+      if type.nil? && !@attacks.empty?
+        type = Command.gets('attack_type')
+        @attacks[type.to_sym] -= 1
       end
       type
     end

@@ -12,7 +12,7 @@ module MortalCombat
         ============================================
       WELL
       loop do
-        unless Command.gets('new_game') == 'yes'
+        if Command.gets('new_game') != 'yes'
           puts "Bye bye!"
           return
         end
@@ -28,11 +28,7 @@ module MortalCombat
     end
 
     def start
-      fighters = if Command.gets('first_move') == 'player'
-        [player, monster]
-      else
-        [monster, player]
-      end
+      fighters = fighters_ordered_by_move
 
       loop do
         result = Turn.new(fighters).process
@@ -45,6 +41,16 @@ module MortalCombat
 
     def end
       puts "The game is over"
+    end
+
+    private
+
+    def fighters_ordered_by_move
+      if Command.gets('first_move') == 'player'
+        [player, monster]
+      else
+        [monster, player]
+      end
     end
   end
 end

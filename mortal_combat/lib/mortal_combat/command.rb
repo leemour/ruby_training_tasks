@@ -4,11 +4,11 @@ module MortalCombat
   class Command
     NEW_GAMES     = %w[yes no].freeze
     FIRST_MOVES   = %w[player monster].freeze
-    ATTACK_TYPES  = %w[normal special].freeze
+    ATTACK_TYPES  = %w[normal special magic].freeze
     PROMPTS = {
-      'new_game'    => "Do you want to start new game? (yes/no)",
-      'first_move'  => "Choose who moves first: 'player' or 'monster'",
-      'attack_type' => "Choose attack type: 'normal' or 'special'",
+      'new_game'    => "Do you want to start new game? #{NEW_GAMES}",
+      'first_move'  => "Choose who moves first: #{FIRST_MOVES}",
+      'attack_type' => "Choose attack type: #{ATTACK_TYPES}",
     }.freeze
 
     attr_reader :command
@@ -17,13 +17,7 @@ module MortalCombat
       puts PROMPTS[command_name]
       print ">> "
       command = new Kernel.gets.strip.downcase
-      command.public_send(command_name)
-    end
-
-    %w[new_game first_move attack_type].each do |command_name|
-      define_method command_name do
-        gets_until_valid(command_name)
-      end
+      command.gets_until_valid(command_name)
     end
 
     def initialize(command)
@@ -33,8 +27,6 @@ module MortalCombat
         exit
       end
     end
-
-    private
 
     def gets_until_valid(command_name)
       valid_commands = Command.const_get("#{command_name}s".upcase)
