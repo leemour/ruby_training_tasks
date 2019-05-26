@@ -1,45 +1,36 @@
 class Game
 
+  attr_reader :fighters
+
   def initialize
     @fighters= []
   end
 
   def start
-    choose_order
+    monster = Monster.new
+    player = Player.new
+    choose_order(monster, player)
 
     puts 'FIGHT!'
 
-    while @fighters[0].alive? && @fighters[1].alive? do
-      @fighters[0].hit(@fighters[1])
-      @fighters[1].hit(@fighters[0])
-    end
-
-    if @fighters[0].alive? && @fighters[0].class.name != 'Player'
-      puts 'You lose'
-    else
-      puts 'You win'
+    result = Fighting.new(fighters).process
+    if result.somebody_died?
+      puts result.output
+      return
     end
 
   end
 
-  def choose_order
-    puts 'Who will be first?'
-    monster = Monster.new
-    player = Player.new
+  def choose_order(monster, player)
 
-    while @fighters.empty?
-      command = Console.get_command
+    while fighters.empty?
+      command = Console.gets('first_move')
 
-      case command.downcase
+      case command
       when 'me'
-        @fighters << player << monster
+        fighters << player << monster
       when 'monster'
-        @fighters << monster << player
-      when 'quit'
-        exit
-      else 
-        puts 'Invalid command'
-        redo
+        fighters << monster << player
       end
     end
   end
