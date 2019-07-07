@@ -5,9 +5,14 @@ module MortalCombat
     attr_reader :health
 
     def initialize(health:, attack_power:)
-      raise ArgumentError.new("Health must be positive integer") if health <= 0
+      raise ArgumentError, "Health must be positive integer" if health <= 0
+
       @health = health
-      @attack_power = attack_power.respond_to?(:sample) ? attack_power : attack_power.to_a
+      @attack_power = if attack_power.respond_to?(:sample)
+        attack_power
+      else
+        attack_power.to_a
+      end
       @attacks = {}
     end
 
@@ -34,7 +39,7 @@ module MortalCombat
     end
 
     def klass
-      @klass ||= self.class.to_s.split('::').last
+      @klass ||= self.class.to_s.split("::").last
     end
 
     def move
@@ -51,7 +56,7 @@ module MortalCombat
 
     def determine_attack_type(type)
       if type.nil? && !@attacks.empty?
-        type = Command.gets('attack_type')
+        type = Command.gets("attack_type")
         @attacks[type.to_sym] -= 1
       end
       type

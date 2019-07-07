@@ -2,6 +2,10 @@
 
 module MortalCombat
   class Game
+    PROMPTS = {
+      "game_over" => "The game is over"
+    }.freeze
+
     attr_reader :player, :monster
 
     def self.setup
@@ -12,8 +16,8 @@ module MortalCombat
         ============================================
       WELL
       loop do
-        if Command.gets('new_game') != 'yes'
-          puts "Bye bye!"
+        if Command.gets("new_game") != "yes"
+          puts Command::PROMPTS["exit"]
           return
         end
         game = new
@@ -40,13 +44,13 @@ module MortalCombat
     end
 
     def end
-      puts "The game is over"
+      puts Game::PROMPTS["game_over"]
     end
 
     private
 
     def fighters_ordered_by_move
-      if Command.gets('first_move') == 'player'
+      if Command.gets("first_move") == "player"
         [player, monster]
       else
         [monster, player]

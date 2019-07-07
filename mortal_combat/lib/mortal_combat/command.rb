@@ -8,10 +8,10 @@ module MortalCombat
       "attack_type" => %w[normal special magic]
     }.freeze
     PROMPTS = {
-      'new_game'    => "Do you want to start new game? #{NEW_GAMES}",
-      'first_move'  => "Choose who moves first: #{FIRST_MOVES}",
-      'attack_type' => "Choose attack type: #{ATTACK_TYPES}",
-      'exit'        => "Bye-bye!"
+      "new_game"    => "Do you want to start new game? #{NEW_GAMES}",
+      "first_move"  => "Choose who moves first: #{FIRST_MOVES}",
+      "attack_type" => "Choose attack type: #{ATTACK_TYPES}",
+      "exit"        => "Bye-bye!"
     }.freeze
 
     attr_reader :command
@@ -20,6 +20,7 @@ module MortalCombat
       unless VALID_INPUT.keys.include? command_name
         raise InvalidCommand, "Command #{command_name} doesn't exist"
       end
+
       puts PROMPTS[command_name]
       print ">> "
       command = new Kernel.gets.strip.downcase
@@ -28,10 +29,7 @@ module MortalCombat
 
     def initialize(command)
       @command = command
-      if command == 'quit'
-        puts Command::PROMPTS['exit']
-        exit
-      end
+      puts(Command::PROMPTS["exit"]) && exit if command == "quit"
     end
 
     def gets_until_valid(command_name)

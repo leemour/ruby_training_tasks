@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe MortalCombat do
   it "has a version number" do
     expect(MortalCombat::VERSION).not_to be nil
