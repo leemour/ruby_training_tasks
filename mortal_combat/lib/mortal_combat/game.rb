@@ -3,6 +3,7 @@
 module MortalCombat
   class Game
     PROMPTS = {
+      "end_round" => "The round is over",
       "game_over" => "The game is over",
       "welcome"   => <<~WELL
         ============================================
@@ -10,6 +11,28 @@ module MortalCombat
           where you will be fighting with a monster
         ============================================
       WELL
+    }.freeze
+    FIGHER_DEFAULTS = {
+      player: {
+        health: 30,
+        attacks: {
+          normal:  {count: -1, enabled: true},
+          special: {count: 1,  enabled: true},
+          magic:   {count: 0,  enabled: false},
+          stun:    {count: 0,  enabled: false},
+          block:   {count: 0,  enabled: false},
+        }
+      },
+      monster: {
+        health: 30,
+        attacks: {
+          normal:  {count: -1, enabled: true},
+          special: {count: 0,  enabled: false},
+          magic:   {count: 0,  enabled: false},
+          stun:    {count: 0,  enabled: false},
+          block:   {count: 0,  enabled: false},
+        }
+      }
     }.freeze
 
     attr_reader :player, :monster
@@ -28,8 +51,14 @@ module MortalCombat
     end
 
     def initialize
-      @player  = Player.new(health: 30, attack_power: (1..6))
-      @monster = Monster.new(health: 30, attack_power: (2..5))
+      @player  = Player.new(
+        health: FIGHER_DEFAULTS[:player][:health],
+        attack_power: (1..6)
+      )
+      @monster = Monster.new(
+        health: FIGHER_DEFAULTS[:monster][:health],
+        attack_power: (2..5)
+      )
     end
 
     def start
@@ -37,7 +66,15 @@ module MortalCombat
 
       loop do
         result = Turn.new(fighters).play
-        return Round.new(result).complete if result.fighter_died?
+        if result.fighter_died?
+          Round.new(result).complete
+          if Command.gets("new_round") != "yes"
+            puts Command::PROMPTS["end_round"]
+            return
+          else
+            reset_fighters
+          end
+        end
       end
     end
 
@@ -52,6 +89,13 @@ module MortalCombat
         [player, monster]
       else
         [monster, player]
+      end
+    end
+
+    def reset_fighers
+      [player, monster].each do |fighter|
+        player.reset_health
+        player.reset_attacks
       end
     end
   end

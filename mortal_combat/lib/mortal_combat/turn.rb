@@ -3,7 +3,8 @@
 module MortalCombat
   class Turn
     PROMTS = {
-      "fight_continues" => "The fight is on"
+      "fight_continues" => "The fight is on",
+      "new_turn"        => "\nNew turn"
     }.freeze
 
     attr_reader :fighter1, :fighter2, :dead_fighter
@@ -13,6 +14,7 @@ module MortalCombat
     end
 
     def play
+      puts PROMTS["new_turn"]
       attack(fighter1, fighter2)
       attack(fighter2, fighter1) unless fighter_died?
       self

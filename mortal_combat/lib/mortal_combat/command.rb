@@ -3,15 +3,20 @@
 module MortalCombat
   class Command
     VALID_INPUT = {
-      "new_game"    => %w[yes no],
+      "attack_type" => %w[normal special magic],
       "first_move"  => %w[player monster],
-      "attack_type" => %w[normal special magic]
+      "increase_attribute" => %w[health attack_power],
+      "new_game"    => %w[yes no],
+      "new_round"   => %w[yes no],
     }.freeze
     PROMPTS = {
-      "new_game"    => "Start a new game? #{VALID_INPUT["new_game"]}",
-      "first_move"  => "Choose who moves first: #{VALID_INPUT["first_move"]}",
       "attack_type" => "Choose attack type: %{prompt}",
-      "exit"        => "Bye-bye!"
+      "exit"        => "Bye-bye!",
+      "first_move"  => "Choose who moves first: #{VALID_INPUT["first_move"]}",
+      "increase_attribute"  => "Choose attribute to increase: "\
+        "#{VALID_INPUT["increase_attribute"]}",
+      "new_game"    => "Start a new game? #{VALID_INPUT["new_game"]}",
+      "new_round"   => "Start a new round? #{VALID_INPUT["new_round"]}"
     }.freeze
 
     attr_reader :command

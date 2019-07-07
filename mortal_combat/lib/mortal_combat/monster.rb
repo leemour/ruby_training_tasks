@@ -12,13 +12,13 @@ module MortalCombat
 
     def initialize(health:, attack_power:, level: 1)
       super
-      @attacks = {
-        normal:  {count: -1, enabled: true},
-        special: {count: 0,  enabled: true},
-        magic:   {count: 0,  enabled: false},
-        stun:    {count: 0,  enabled: false},
-        block:   {count: 0,  enabled: false},
-      }
+      @attacks = Game::FIGHER_DEFAULTS[:monster][:attacks]
+    end
+
+    private
+
+    def determine_attack_type(type)
+      available_attacks.sample
     end
   end
 end

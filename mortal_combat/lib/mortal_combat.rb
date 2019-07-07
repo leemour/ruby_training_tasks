@@ -15,4 +15,5 @@ require "mortal_combat/monster"
 
 module MortalCombat
   class NotImplementedError < StandardError; end
+  class InvalidCommand < StandardError; end
 end

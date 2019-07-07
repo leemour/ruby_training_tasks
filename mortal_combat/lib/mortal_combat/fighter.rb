@@ -29,6 +29,7 @@ module MortalCombat
       end
       @attacks = {}
       @level = level
+      @level_health = 0
       @stunned = false
     end
 
@@ -36,13 +37,7 @@ module MortalCombat
       (@stunned = false) && return if stunned?
 
       type = determine_attack_type(type)
-      damage = if type && respond_to?("#{type}_attack")
-        send("#{type}_attack",defender)
-      else
-        normal_attack(defender)
-      end
-
-      binding.pry
+      damage = calculate_damage_for_attack(type, defender)
       attacks[type.to_sym][:count] -= 1
 
       puts "#{klass} hits #{defender.klass} for #{damage} damage. "
@@ -67,7 +62,7 @@ module MortalCombat
     end
 
     def increase_health
-      health += 1
+      @level_health += 1
     end
 
     def increase_attack_power
@@ -75,10 +70,25 @@ module MortalCombat
     end
 
     def available_attacks
-      attacks.each do |name, attributes|
-        next if attributes[:enabled] == false || attributes[:count] == 0
-        name.to_s
+      attacks.reduce([]) do |list, (name, attributes)|
+        next list if attributes[:enabled] == false || attributes[:count] == 0
+        list << name.to_s
+        list
       end
+    end
+
+    def level=(value)
+      @level = value
+      run_level_up_hooks
+    end
+
+    def reset_health
+      self.health = FIGHER_DEFAULTS[klass.downcase.to_sym][:health] +
+        @level_health
+    end
+
+    def reset_attacks
+      self.health = FIGHER_DEFAULTS[klass.downcase.to_sym][:attacks]
     end
 
     private
@@ -92,6 +102,14 @@ module MortalCombat
     def determine_attack_type(type)
       if type.nil? && !attacks.values.all? { |attack| attack[:count].zero? }
         Command.gets("attack_type", prompt: available_attacks)
+      end
+    end
+
+    def calculate_damage_for_attack(type, defender)
+      if type && respond_to?("#{type}_attack")
+        send("#{type}_attack", defender)
+      else
+        normal_attack(defender)
       end
     end
 
