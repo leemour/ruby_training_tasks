@@ -12,19 +12,9 @@ module MortalCombat
       @fighter1, @fighter2 = fighters
     end
 
-    def process
-      fighter1.attack fighter2
-      if fighter2.dead?
-        @dead_fighter = fighter2
-        @alive_fighter = fighter1
-        return self
-      end
-
-      fighter2.attack fighter1
-      if fighter2.dead?
-        @dead_fighter = fighter1
-        @alive_fighter = fighter2
-      end
+    def play
+      attack(fighter1, fighter2)
+      attack(fighter2, fighter1) unless fighter_died?
       self
     end
 
@@ -37,6 +27,16 @@ module MortalCombat
         "#{@dead_fighter.klass} died. #{@alive_fighter.klass} wins!"
       else
         Turn::PROMTS["fight_continues"]
+      end
+    end
+
+    private
+
+    def attack(attacker, defender)
+      attacker.attack defender
+      if defender.dead?
+        @dead_fighter = defender
+        @alive_fighter = attacker
       end
     end
   end

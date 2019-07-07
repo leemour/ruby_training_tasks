@@ -3,18 +3,19 @@
 module MortalCombat
   class Game
     PROMPTS = {
-      "game_over" => "The game is over"
-    }.freeze
-
-    attr_reader :player, :monster
-
-    def self.setup
-      puts <<~WELL
+      "game_over" => "The game is over",
+      "welcome"   => <<~WELL
         ============================================
           Welcome to Mortal Combat. This is a turn-based single player game
           where you will be fighting with a monster
         ============================================
       WELL
+    }.freeze
+
+    attr_reader :player, :monster
+
+    def self.setup
+      puts PROMPTS["welcome"]
       loop do
         if Command.gets("new_game") != "yes"
           puts Command::PROMPTS["exit"]
@@ -35,11 +36,8 @@ module MortalCombat
       fighters = fighters_ordered_by_move
 
       loop do
-        result = Turn.new(fighters).process
-        if result.fighter_died?
-          puts result.output
-          return
-        end
+        result = Turn.new(fighters).play
+        return Round.new(result).complete if result.fighter_died?
       end
     end
 

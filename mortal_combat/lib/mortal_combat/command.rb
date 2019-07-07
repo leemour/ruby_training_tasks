@@ -8,20 +8,20 @@ module MortalCombat
       "attack_type" => %w[normal special magic]
     }.freeze
     PROMPTS = {
-      "new_game"    => "Do you want to start new game? #{NEW_GAMES}",
-      "first_move"  => "Choose who moves first: #{FIRST_MOVES}",
-      "attack_type" => "Choose attack type: #{ATTACK_TYPES}",
+      "new_game"    => "Start a new game? #{VALID_INPUT["new_game"]}",
+      "first_move"  => "Choose who moves first: #{VALID_INPUT["first_move"]}",
+      "attack_type" => "Choose attack type: %{prompt}",
       "exit"        => "Bye-bye!"
     }.freeze
 
     attr_reader :command
 
-    def self.gets(command_name)
+    def self.gets(command_name, prompt: "")
       unless VALID_INPUT.keys.include? command_name
         raise InvalidCommand, "Command #{command_name} doesn't exist"
       end
 
-      puts PROMPTS[command_name]
+      puts PROMPTS[command_name].sub("%{prompt}", prompt.to_s)
       print ">> "
       command = new Kernel.gets.strip.downcase
       command.gets_until_valid(command_name)

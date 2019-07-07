@@ -2,10 +2,24 @@
 
 module MortalCombat
   class Fighter
-    attr_reader :health
+    attr_reader :health, :level, :attacks
 
-    def initialize(health:, attack_power:)
-      raise ArgumentError, "Health must be positive integer" if health <= 0
+    class << self
+      attr_reader :level_up_hooks
+
+      def add_level_up_hook(hook)
+        level_up_hooks << hook
+      end
+
+      def inherited(base)
+        base.class_eval do
+          @level_up_hooks = []
+        end
+      end
+    end
+
+    def initialize(health:, attack_power:, level: 1)
+      raise ArgumentError, "Health must be a positive integer" if health <= 0
 
       @health = health
       @attack_power = if attack_power.respond_to?(:sample)
@@ -14,19 +28,25 @@ module MortalCombat
         attack_power.to_a
       end
       @attacks = {}
+      @level = level
+      @stunned = false
     end
 
-    def attack(opponent, type = nil)
-      type = determine_attack_type(type)
+    def attack(defender, type = nil)
+      (@stunned = false) && return if stunned?
 
-      damage = if type && respond_to?("#{type}_attack_power")
-        send("#{type}_attack_power")
+      type = determine_attack_type(type)
+      damage = if type && respond_to?("#{type}_attack")
+        send("#{type}_attack",defender)
       else
-        attack_power
+        normal_attack(defender)
       end
 
-      puts "#{klass} hits #{opponent.klass} for #{damage} damage. "
-      opponent.take_damage(damage)
+      binding.pry
+      attacks[type.to_sym][:count] -= 1
+
+      puts "#{klass} hits #{defender.klass} for #{damage} damage. "
+      defender.take_damage(damage)
     end
 
     def take_damage(damage)
@@ -46,20 +66,41 @@ module MortalCombat
       raise NotImplmentedError, "Implement '#{__method__}' method"
     end
 
+    def increase_health
+      health += 1
+    end
+
+    def increase_attack_power
+      attack_power << attack_power.last + 1
+    end
+
+    def available_attacks
+      attacks.each do |name, attributes|
+        next if attributes[:enabled] == false || attributes[:count] == 0
+        name.to_s
+      end
+    end
+
     private
 
-    attr_writer :health
+    attr_writer :health, :level_up_hooks
 
     def attack_power
       @attack_power.sample
     end
 
     def determine_attack_type(type)
-      if type.nil? && !@attacks.empty?
-        type = Command.gets("attack_type")
-        @attacks[type.to_sym] -= 1
+      if type.nil? && !attacks.values.all? { |attack| attack[:count].zero? }
+        Command.gets("attack_type", prompt: available_attacks)
       end
-      type
+    end
+
+    def run_level_up_hooks
+      self.class.level_up_hooks.each do |hook|
+        next if hook[:level] != level || hook[:level] != "all"
+
+        method(hook[:method]).call(hook[:options])
+      end
     end
   end
 end
